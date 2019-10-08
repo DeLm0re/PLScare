@@ -3,6 +3,7 @@ import cv2
 import posenet
 import time
 import argparse
+import matplotlib.pyplot as plt
 
 import PLScare
 
@@ -34,6 +35,10 @@ def main():
         start = time.time()
         frame_count = 0
 
+        # array used for measurement
+        time_array = []
+        average_array = []
+
         # main loop
         while True:
             # read an image from the capture device or video
@@ -62,19 +67,29 @@ def main():
                 display_image, pose_scores, keypoint_scores, keypoint_coords,
                 min_pose_score=0.15, min_part_score=0.1)
 
+            # get the body on the image
+            body_image = PLScare.detection.get_body(
+                pose_scores,
+                keypoint_scores,
+                keypoint_coords,
+                display_image)
+
             # show the image
-            cv2.imshow("posenet",
-                       PLScare.detection.get_body(
-                           pose_scores,
-                           keypoint_scores,
-                           keypoint_coords,
-                           overlay_image))
+            cv2.imshow("posenet", body_image)
             frame_count += 1
+
+            time_array.append(time.time() - start)
+            average_array.append(PLScare.image_treatment.get_average_value(body_image))
 
             # check the 'q' key to end th eloop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+        plt.plot(time_array, average_array)
+        plt.title("average over time")
+        plt.xlabel("time (s)")
+        plt.ylabel("average")
+        plt.show()
         cap.release()
         cv2.destroyAllWindows()
 
