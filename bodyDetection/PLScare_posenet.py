@@ -4,6 +4,8 @@ import posenet
 import time
 import argparse
 import matplotlib.pyplot as plt
+import scipy.fftpack as fft
+import numpy as np
 
 import PLScare
 
@@ -74,12 +76,12 @@ def main():
                 keypoint_coords,
                 display_image)
 
-            # show the image
-            cv2.imshow("posenet", body_image)
-            frame_count += 1
-
             time_array.append(time.time() - start)
             average_array.append(PLScare.image_treatment.get_average_value(body_image))
+
+            cv2.imshow("posenet", body_image)
+
+            frame_count += 1
 
             # check the 'q' key to end th eloop
             if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -90,6 +92,16 @@ def main():
         plt.xlabel("time (s)")
         plt.ylabel("average")
         plt.show()
+
+        average_array_transform = fft.fft(average_array)
+        nb_frequency = 500
+        frequency_array = np.linspace(0, len(average_array_transform)/nb_frequency, len(average_array_transform))
+        plt.plot(frequency_array, average_array_transform)
+        plt.title("average over frequency")
+        plt.xlabel("frequency")
+        plt.ylabel("average")
+        plt.show()
+
         cap.release()
         cv2.destroyAllWindows()
 
