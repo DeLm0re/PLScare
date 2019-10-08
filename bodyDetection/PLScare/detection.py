@@ -3,11 +3,6 @@ import math
 import numpy as np
 
 
-# Get the skeleton with the highest score
-def get_best_skeleton(pose_scores):
-    return np.argmax(pose_scores)
-
-
 # Get the coordinate that describe the torso
 def get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, part_name1, part_name2, part_name3, part_name4):
     part1_coord = [0, 0]
@@ -61,7 +56,7 @@ def get_height_face(x_left_eye, x_right_eye):
 
 def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
     if len(pose_scores) > 0:
-        pose_id = get_best_skeleton(pose_scores)
+        pose_id = np.argmax(pose_scores)
 
         left_shoulder_info, right_shoulder_info, left_hip_info, right_hip_info = \
             get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords,
@@ -79,7 +74,7 @@ def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
 
 def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
     if len(pose_scores) > 0:
-        pose_id = get_best_skeleton(pose_scores)
+        pose_id = np.argmax(pose_scores)
 
         left_ear_info, right_ear_info, left_eye_info, right_eye_info = \
             get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords,
