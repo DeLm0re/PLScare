@@ -1,11 +1,10 @@
 import tensorflow as tf
 import cv2
+import posenet
 import time
 import argparse
 
-import respiration.respiration
-import face.face
-import posenet
+import PLScare.detection
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=int, default=101)
@@ -65,7 +64,7 @@ def main():
 
             # show the image
             cv2.imshow("posenet",
-                       face.face.get_eyes(
+                       PLScare.detection.get_body(
                            pose_scores,
                            keypoint_scores,
                            keypoint_coords,
