@@ -1,17 +1,11 @@
 import posenet
 import math
+import numpy as np
 
 
 # Get the skeleton with the highest score
 def get_best_skeleton(pose_scores):
-    pose_id = 0
-    pose_score = 0
-    for pi in range(0, len(pose_scores)):
-        if pose_scores[pi] > pose_score:
-            pose_id = pi
-            pose_score = pose_scores[pi]
-
-    return pose_id
+    return np.argmax(pose_scores)
 
 
 # Get the coordinate that describe the torso
