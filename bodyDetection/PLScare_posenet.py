@@ -4,7 +4,7 @@ import posenet
 import time
 import argparse
 
-import PLScare.detection
+import PLScare
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=int, default=101)
