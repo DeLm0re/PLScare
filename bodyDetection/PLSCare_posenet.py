@@ -4,6 +4,7 @@ import time
 import argparse
 
 import respiration.respiration
+import face.face
 import posenet
 
 parser = argparse.ArgumentParser()
@@ -64,7 +65,7 @@ def main():
 
             # show the image
             cv2.imshow("posenet",
-                       respiration.respiration.get_body(
+                       face.face.get_eyes(
                            pose_scores,
                            keypoint_scores,
                            keypoint_coords,
