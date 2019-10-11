@@ -3,23 +3,15 @@ import math
 import numpy as np
 
 
-# Get the coordinate that describe the torso
-def get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, part_name1, part_name2, part_name3, part_name4):
-    part1_coord = [0, 0]
-    part2_coord = [0, 0]
-    part3_coord = [0, 0]
-    part4_coord = [0, 0]
-    for ki, (score, coord) in enumerate(zip(keypoint_scores[pose_id, :], keypoint_coords[pose_id, :, :])):
-        if posenet.PART_NAMES[ki] == part_name1:
-            part1_coord = coord
-        if posenet.PART_NAMES[ki] == part_name2:
-            part2_coord = coord
-        if posenet.PART_NAMES[ki] == part_name3:
-            part3_coord = coord
-        if posenet.PART_NAMES[ki] == part_name4:
-            part4_coord = coord
+# Get the coordinates of the given body parts
+def get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names):
+    parts_coord = np.zeros((len(parts_names),2))
 
-    return [part1_coord, part2_coord, part3_coord, part4_coord]
+    for ki, (score, coord) in enumerate(zip(keypoint_scores[pose_id, :], keypoint_coords[pose_id, :, :])):
+        for index, part_name in enumerate(parts_names):
+            if posenet.PART_NAMES[ki] == part_name:
+                parts_coord[index] = coord
+    return parts_coord
 
 
 # Create a square out of the different coordinate
@@ -57,10 +49,10 @@ def get_height_face(x_left_eye, x_right_eye):
 def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
     if len(pose_scores) > 0:
         pose_id = np.argmax(pose_scores)
+        parts_names = ['leftShoulder', 'rightShoulder', 'leftHip', 'rightHip']
 
         left_shoulder_info, right_shoulder_info, left_hip_info, right_hip_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords,
-                               'leftShoulder', 'rightShoulder', 'leftHip', 'rightHip')
+            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords,parts_names)
 
         xmin = min(left_shoulder_info[1], right_shoulder_info[1], left_hip_info[1], right_hip_info[1])
         xmax = max(left_shoulder_info[1], right_shoulder_info[1], left_hip_info[1], right_hip_info[1])
@@ -75,10 +67,10 @@ def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
 def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
     if len(pose_scores) > 0:
         pose_id = np.argmax(pose_scores)
+        parts_names = ['leftEar', 'rightEar', 'leftEye', 'rightEye']
 
         left_ear_info, right_ear_info, left_eye_info, right_eye_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords,
-                               'leftEar', 'rightEar', 'leftEye', 'rightEye')
+            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords,parts_names)
 
         xmin = right_ear_info[1]
         xmax = left_ear_info[1]
