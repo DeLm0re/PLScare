@@ -3,6 +3,9 @@ import cv2
 import posenet
 import time
 import argparse
+import matplotlib.pyplot as plt
+import scipy.fftpack as fft
+import numpy as np
 
 import PLScare.detection
 
@@ -62,13 +65,8 @@ def main():
                 display_image, pose_scores, keypoint_scores, keypoint_coords,
                 min_pose_score=0.15, min_part_score=0.1)
 
-            # show the image
-            cv2.imshow("posenet",
-                       PLScare.detection.get_body(
-                           pose_scores,
-                           keypoint_scores,
-                           keypoint_coords,
-                           overlay_image))
+            cv2.imshow("posenet", overlay_image)
+
             frame_count += 1
 
             # check the 'q' key to end th eloop
