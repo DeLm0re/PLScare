@@ -90,6 +90,23 @@ def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
         return crop_image(square, image)
 
 
+def get_person(pose_scores, keypoint_scores, keypoint_coords, image):
+    if len(pose_scores) > 0:
+        pose_id = np.argmax(pose_scores)
+        parts_names = ['nose','leftEye','rightEye','leftEar','rightEar','leftShoulder','rightShoulder','leftElbow','rightElbow','leftWrist','rightWrist','leftHip','rightHip','leftKnee','rightKnee','leftAnkle','rightAnkle']
+
+        parts_coord = np.array(get_coord_skeleton(pose_id,keypoint_scores,keypoint_coords,parts_names))
+
+        xmin = min(parts_coord[:,1])
+        xmax = max(parts_coord[:,1])
+        ymin = min(parts_coord[:,0])
+        ymax = max(parts_coord[:,0])
+
+        square = create_square(xmin,xmax,ymin,ymax, scale=1)
+
+        return crop_image(square, image)
+
+
 def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords):
     if len(pose_scores) > 0:
         # Extract all pose and information used for the detection
