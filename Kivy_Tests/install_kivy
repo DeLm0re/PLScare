@@ -1,0 +1,21 @@
+Intaller les dépendances (utilisées par cython, pygame et kivy) :
+
+sudo apt-get install python-setuptools python-pygame python-opengl python-enchant python-dev build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev
+
+-----
+
+Intaller cython (pour le core de kivy) :
+
+pip3 install cython
+
+-----
+
+Installer pygame (pour le display de kivy) :
+
+pip3 install pygame
+
+-----
+
+Enfin installer kivy :
+
+pip3 install kivy
