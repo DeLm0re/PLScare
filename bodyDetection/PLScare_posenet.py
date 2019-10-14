@@ -37,10 +37,6 @@ def main():
         start = time.time()
         frame_count = 0
 
-        # array used for measurement
-        time_array = []
-        average_array = []
-
         # main loop
         while True:
             # read an image from the capture device or video
@@ -69,38 +65,13 @@ def main():
                 display_image, pose_scores, keypoint_scores, keypoint_coords,
                 min_pose_score=0.15, min_part_score=0.1)
 
-            # get the body on the image
-            body_image = PLScare.detection.get_body(
-                pose_scores,
-                keypoint_scores,
-                keypoint_coords,
-                display_image)
-
-            time_array.append(time.time() - start)
-            average_array.append(PLScare.image_treatment.get_average_value(body_image))
-
-            cv2.imshow("posenet", body_image)
+            cv2.imshow("posenet", overlay_image)
 
             frame_count += 1
 
             # check the 'q' key to end th eloop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-
-        plt.plot(time_array, average_array)
-        plt.title("average over time")
-        plt.xlabel("time (s)")
-        plt.ylabel("average")
-        plt.show()
-
-        average_array_transform = fft.fft(average_array)
-        nb_frequency = 500
-        frequency_array = np.linspace(0, len(average_array_transform)/nb_frequency, len(average_array_transform))
-        plt.plot(frequency_array, average_array_transform)
-        plt.title("average over frequency")
-        plt.xlabel("frequency")
-        plt.ylabel("average")
-        plt.show()
 
         cap.release()
         cv2.destroyAllWindows()
