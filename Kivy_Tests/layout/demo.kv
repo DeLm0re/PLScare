@@ -1,0 +1,23 @@
+<ImgLogo>:
+    source: 'images/logo_PLScare.png'
+    size_hint: (None, None)
+    size_hint: 0.8, 0.8
+    pos_hint: {'center_x': 0.5, 'center_y': 0.7}
+
+<BtnHub>:
+    text: 'Start recording'
+    canvas.before:
+        Color:
+            rgba: 1, 0, 0, 1
+        Line:
+            width: 5
+            rectangle: self.x, self.y, self.width, self.height
+    size_hint: (None, None)
+    size: self.texture_size
+    pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+    background_normal: ''
+    background_down: 'images/grey.png'
+    color: 1, 0, 0, 1
+    font_name: 'fonts/OpenSans-Bold.ttf'
+    font_size: 50
+    padding: (30, 10)
