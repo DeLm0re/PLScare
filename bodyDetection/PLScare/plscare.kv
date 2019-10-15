@@ -1,10 +1,10 @@
-<ImgLogo>:
-    source: 'images/logo_PLScare.png'
+<LogoImg>:
+    source: 'PLScare/assets/images/logo_PLScare.png'
     size_hint: (None, None)
     size_hint: 0.8, 0.8
     pos_hint: {'center_x': 0.5, 'center_y': 0.7}
 
-<BtnHub>:
+<HubBtn>:
     text: 'Start recording'
     canvas.before:
         Color:
@@ -16,8 +16,8 @@
     size: self.texture_size
     pos_hint: {'center_x': 0.5, 'center_y': 0.3}
     background_normal: ''
-    background_down: 'images/grey.png'
+    background_down: 'assets/images/grey.png'
     color: 1, 0, 0, 1
-    font_name: 'fonts/OpenSans-Bold.ttf'
+    font_name: 'PLScare/assets/fonts/OpenSans-Bold.ttf'
     font_size: 50
     padding: (30, 10)

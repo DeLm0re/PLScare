@@ -26,25 +26,25 @@ def on_anything(*args, **kwargs):
           'and **kwargs of', str(kwargs))
 
 
-class ImgLogo(Image):
+class LogoImg(Image):
     pass
 
 
-class BtnHub(Button):
+class HubBtn(Button):
     pass
 
 
-class DemoBox(FloatLayout):
+class PlscareLayout(FloatLayout):
 
     def __init__(self, **kwargs):
-        super(DemoBox, self).__init__(**kwargs)
+        super(PlscareLayout, self).__init__(**kwargs)
 
         # init the window
         init_window(600, 600)
 
         # declaration des hub elements
-        btn_hub = BtnHub()
-        img_logo = ImgLogo()
+        btn_hub = HubBtn()
+        img_logo = LogoImg()
 
         # event on hub button
         btn_hub.bind(on_press=on_event)
@@ -55,10 +55,10 @@ class DemoBox(FloatLayout):
         self.add_widget(img_logo)
 
 
-class DemoApp(App):
+class PlscareApp(App):
     def build(self):
-        return DemoBox()
+        return PlscareLayout()
 
 
-if __name__ == '__main__':
-    DemoApp().run()
+def run_app():
+    PlscareApp().run()
