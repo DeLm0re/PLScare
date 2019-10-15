@@ -49,7 +49,7 @@ def main():
                 feed_dict={'image:0': input_image}
             )
 
-            # calculate the different points
+            # calculate the different key points
             pose_scores, keypoint_scores, keypoint_coords = posenet.decode_multi.decode_multiple_poses(
                 heatmaps_result.squeeze(axis=0),
                 offsets_result.squeeze(axis=0),
@@ -58,14 +58,14 @@ def main():
                 output_stride=output_stride,
                 max_pose_detections=10,
                 min_pose_score=0.15)
-
             keypoint_coords *= output_scale
-            # show the points which has been found on the image
+
+            # show the key points which has been found on the image
             overlay_image = posenet.draw_skel_and_kp(
                 display_image, pose_scores, keypoint_scores, keypoint_coords,
                 min_pose_score=0.15, min_part_score=0.1)
 
-            cv2.imshow("posenet", overlay_image)
+            cv2.imshow("PLScare", overlay_image)
             frame_count += 1
 
             # check the 'q' key to end th eloop
