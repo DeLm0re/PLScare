@@ -68,7 +68,7 @@ def main():
             cv2.imshow("PLScare", overlay_image)
             frame_count += 1
 
-            # check the 'q' key to end th eloop
+            # check the 'q' key to end the loop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
