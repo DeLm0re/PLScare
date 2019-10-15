@@ -16,6 +16,26 @@ def get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, part_names):
     return total_info
 
 
+# Get the pose id of the skeleton which is the most centered on the picture
+def get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_height, window_width):
+    nb_pose = len(keypoint_scores)
+    list_center_gravity = [[0 for x in range(2)] for y in range(nb_pose)]
+    for pose_id in range(nb_pose):
+        for ki, (score, coord) in enumerate(zip(keypoint_scores[pose_id, :], keypoint_coords[pose_id, :, :])):
+            list_center_gravity[pose_id][1] = np.average(coord[1])
+            list_center_gravity[pose_id][0] = np.average(coord[0])
+
+    x_center = window_width/2
+    y_center = window_height/2
+    list_dist_center = np.zeros(nb_pose)
+    for pose_id in range(nb_pose):
+        list_dist_center[pose_id] = \
+            np.power(list_center_gravity[pose_id][1] - x_center, 2) + \
+            np.power(list_center_gravity[pose_id][0] - y_center, 2)
+
+    return np.argmin(list_dist_center)
+
+
 # Create a square out of the different coordinate
 def create_square(xmin, xmax, ymin, ymax, scale):
     square = [int(xmin),
@@ -48,9 +68,9 @@ def get_height_face(x_left_eye, x_right_eye):
     return height_face
 
 
-def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
+def get_body(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
     if len(pose_scores) > 0:
-        pose_id = np.argmax(pose_scores)
+        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
         parts_names = ['leftShoulder', 'rightShoulder', 'leftHip', 'rightHip']
 
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
@@ -69,9 +89,9 @@ def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
         return crop_image(square, image)
 
 
-def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
+def get_face(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
     if len(pose_scores) > 0:
-        pose_id = np.argmax(pose_scores)
+        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
         parts_names = ['leftEar', 'rightEar', 'leftEye', 'rightEye']
 
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
@@ -86,9 +106,9 @@ def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
         return crop_image(square, image)
 
 
-def get_person(pose_scores, keypoint_scores, keypoint_coords, image):
+def get_person(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
     if len(pose_scores) > 0:
-        pose_id = np.argmax(pose_scores)
+        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
         parts_names = ['nose', 'leftEye', 'rightEye', 'leftEar', 'rightEar', 'leftShoulder', 'rightShoulder',
                        'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist', 'leftHip', 'rightHip', 'leftKnee',
                        'rightKnee', 'leftAnkle', 'rightAnkle']
@@ -105,10 +125,10 @@ def get_person(pose_scores, keypoint_scores, keypoint_coords, image):
         return crop_image(square, image)
 
 
-def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords):
+def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords, window_width, window_height):
     if len(pose_scores) > 0:
         # Extract all pose and information used for the detection
-        pose_id = np.argmax(pose_scores)
+        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
         parts_names = ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist']
 
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
