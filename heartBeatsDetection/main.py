@@ -7,9 +7,7 @@ import matplotlib.pyplot as plt
 import skinMask
 
 
-# Captured frames counter
-capturedFrames = 0
-# Output videos names
+# Output videos name
 videoName = 'originalVideo.avi'
 
 
@@ -18,15 +16,14 @@ cap = cv2.VideoCapture(0)
 
 # Define the codec and create VideoWriter object
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-videoOut = cv2.VideoWriter(videoName,fourcc, 60.0, (640,480))
+videoOut = cv2.VideoWriter(videoName,fourcc, 30, (640,480))
 
+recordedFrame = 0
 
 while cap.isOpened():
     # Check video aquisition
     ret, frame = cap.read()
     if ret:
-
-        capturedFrames = capturedFrames + 1
 
         # flip the frame to be mirror like
         frame = cv2.flip(frame,1)
@@ -39,10 +36,11 @@ while cap.isOpened():
         # show the skin in the image along with the mask
         cv2.imshow('frame', np.hstack([frame, skin]))
 
-        # ignore the 100 first frames
-        if capturedFrames >= 100:
-            # Write frame
+        # Write frame
+        if recordedFrame > 50 :
             videoOut.write(frame)
+
+        recordedFrame = recordedFrame + 1
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

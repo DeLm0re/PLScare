@@ -18,6 +18,14 @@ skinName = 'skinMask.avi'
 print('Processing...')
 cap = cv2.VideoCapture(videoName)
 
+# Find OpenCV version
+(major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
+if int(major_ver) < 3:
+    fps = cap.get(cv2.cv.CV_CAP_PROP_FPS)
+else:
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+
 while cap.isOpened():
     # Check video aquisition
     ret, frame = cap.read()
@@ -30,9 +38,6 @@ while cap.isOpened():
 
         # get average Hue value for the pixels of skin
         hues = skin[:, :, 0]
-
-        # show the skin in the image along with the mask
-        cv2.imshow('frame', np.hstack([frame, skin]))
 
         # Save the average hues
         meanHues.append(np.mean(hues))
@@ -49,20 +54,26 @@ while cap.isOpened():
 cap.release()
 cv2.destroyAllWindows()
 
+N = recordedFrames
+T = 1.0/fps
+f = 1.0/(2.0*T)
 
-plt.plot(meanHues)
+x = np.linspace(0.0, N*T, N)
+y = np.diff(meanHues)/np.diff(x)
+x = x[:-1]
+
+plt.plot(x, y)
 plt.title("Average Hues per frame")
 plt.ylabel("Average Hue")
-plt.xlabel("Frame number")
+plt.xlabel("Time (s)")
 plt.show()
 
-
-x = range(1, recordedFrames + 1)
-y = meanHues
-
+xf = np.linspace(0.0, f, N//2)
+xf = xf[:-1]
 yf = fft(y)
+yf = yf[N//2:N//2 + len(xf)]
 
-plt.plot(x, yf)
+plt.plot(xf, yf)
 plt.title("FFT")
-plt.xlabel("Frame number")
+plt.xlabel("Hz")
 plt.show()
