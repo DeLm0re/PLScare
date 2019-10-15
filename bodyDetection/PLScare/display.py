@@ -13,17 +13,13 @@ def init_window(height, width):
     Window.size = (height, width)
 
 
-def on_event(obj):
-    print('Typical event from', obj)
+def run_app():
+    PlscareApp().run()
 
 
-def on_property(obj, value):
-    print('Typical property change from', obj, 'to', value)
-
-
-def on_anything(*args, **kwargs):
-    print('The flexible function has *args of', str(args),
-          'and **kwargs of', str(kwargs))
+class PlscareApp(App):
+    def build(self):
+        return PlscareLayout()
 
 
 class LogoImg(Image):
@@ -47,18 +43,12 @@ class PlscareLayout(FloatLayout):
         img_logo = LogoImg()
 
         # event on hub button
-        btn_hub.bind(on_press=on_event)
+        btn_hub.bind(on_press=self.checkout)
 
         # add element in layout
         # check .kv file
         self.add_widget(btn_hub)
         self.add_widget(img_logo)
 
-
-class PlscareApp(App):
-    def build(self):
-        return PlscareLayout()
-
-
-def run_app():
-    PlscareApp().run()
+    def checkout(self, value):
+        self.clear_widgets()
