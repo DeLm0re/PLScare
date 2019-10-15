@@ -4,7 +4,7 @@ import numpy as np
 
 
 # Get the coordinate that describe the torso
-def get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, part_names):
+def get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, part_names):
     total_info = dict()
     for ki, (score, coord) in enumerate(zip(keypoint_scores[pose_id, :], keypoint_coords[pose_id, :, :])):
         for part_name in part_names:
@@ -53,7 +53,7 @@ def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
         pose_id = np.argmax(pose_scores)
         parts_names = ['leftShoulder', 'rightShoulder', 'leftHip', 'rightHip']
 
-        parts_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+        parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
         x_min = min(parts_info['leftShoulder']['x'], parts_info['rightShoulder']['x'],
                     parts_info['leftHip']['x'], parts_info['rightHip']['x'])
@@ -74,7 +74,7 @@ def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
         pose_id = np.argmax(pose_scores)
         parts_names = ['leftEar', 'rightEar', 'leftEye', 'rightEye']
 
-        parts_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+        parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
         x_min = parts_info['rightEar']['x']
         x_max = parts_info['leftEar']['x']
@@ -93,7 +93,7 @@ def get_person(pose_scores, keypoint_scores, keypoint_coords, image):
                        'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist', 'leftHip', 'rightHip', 'leftKnee',
                        'rightKnee', 'leftAnkle', 'rightAnkle']
 
-        parts_info = np.array(get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names))
+        parts_info = np.array(get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names))
 
         x_min = min(parts_info[:]['x'])
         x_max = max(parts_info[:]['x'])
@@ -111,7 +111,7 @@ def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords):
         pose_id = np.argmax(pose_scores)
         parts_names = ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist']
 
-        parts_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+        parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
         # get the best elbow and shoulder point
         if parts_info['leftShoulder']['score'] > parts_info['rightShoulder']['score']:
