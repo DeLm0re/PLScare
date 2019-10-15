@@ -4,18 +4,16 @@ import numpy as np
 
 
 # Get the coordinate that describe the torso
-def get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, part_name):
-    part_coord = [0, 0]
-    part_score = 0
+def get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, part_names):
+    total_info = dict()
     for ki, (score, coord) in enumerate(zip(keypoint_scores[pose_id, :], keypoint_coords[pose_id, :, :])):
-        if posenet.PART_NAMES[ki] == part_name:
-            part_coord = coord
-            part_score = score
-    info = dict()
-    info['x'] = part_coord[0]
-    info['y'] = part_coord[1]
-    info['score'] = part_score
-    return info
+        for part_name in part_names:
+            if posenet.PART_NAMES[ki] == part_name:
+                total_info[part_name] = dict()
+                total_info[part_name]['x'] = coord[1]
+                total_info[part_name]['y'] = coord[0]
+                total_info[part_name]['score'] = score
+    return total_info
 
 
 # Create a square out of the different coordinate
@@ -55,15 +53,16 @@ def get_body(pose_scores, keypoint_scores, keypoint_coords, image):
         pose_id = np.argmax(pose_scores)
         parts_names = ['leftShoulder', 'rightShoulder', 'leftHip', 'rightHip']
 
-        left_shoulder_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'leftShoulder')
-        right_shoulder_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'rightShoulder')
-        left_hip_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'leftHip')
-        right_hip_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'rightHip')
+        parts_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
-        x_min = min(left_shoulder_info['x'], right_shoulder_info['x'], left_hip_info['x'], right_hip_info['x'])
-        x_max = max(left_shoulder_info['x'], right_shoulder_info['x'], left_hip_info['x'], right_hip_info['x'])
-        y_min = min(left_shoulder_info['y'], right_shoulder_info['y'], left_hip_info['y'], right_hip_info['y'])
-        y_max = max(left_shoulder_info['y'], right_shoulder_info['y'], left_hip_info['y'], right_hip_info['y'])
+        x_min = min(parts_info['leftShoulder']['x'], parts_info['rightShoulder']['x'],
+                    parts_info['leftHip']['x'], parts_info['rightHip']['x'])
+        x_max = max(parts_info['leftShoulder']['x'], parts_info['rightShoulder']['x'],
+                    parts_info['leftHip']['x'], parts_info['rightHip']['x'])
+        y_min = min(parts_info['leftShoulder']['y'], parts_info['rightShoulder']['y'],
+                    parts_info['leftHip']['y'], parts_info['rightHip']['y'])
+        y_max = max(parts_info['leftShoulder']['y'], parts_info['rightShoulder']['y'],
+                    parts_info['leftHip']['y'], parts_info['rightHip']['y'])
 
         square = create_square(x_min, x_max, y_min, y_max, 1.3)
 
@@ -75,15 +74,12 @@ def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
         pose_id = np.argmax(pose_scores)
         parts_names = ['leftEar', 'rightEar', 'leftEye', 'rightEye']
 
-        left_ear_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'leftEar')
-        right_ear_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'rightEar')
-        left_eye_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'leftEye')
-        right_eye_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'rightEye')
+        parts_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
-        x_min = right_ear_info['x']
-        x_max = left_ear_info['x']
-        y_min = left_eye_info['y'] - get_height_face(left_eye_info['x'], right_eye_info['x']) / 2
-        y_max = left_eye_info['y'] + get_height_face(left_eye_info['x'], right_eye_info['x']) / 2
+        x_min = parts_info['rightEar']['x']
+        x_max = parts_info['leftEar']['x']
+        y_min = parts_info['leftEye']['y']-get_height_face(parts_info['leftEye']['x'], parts_info['rightEye']['x']) / 2
+        y_max = parts_info['leftEye']['y']+get_height_face(parts_info['leftEye']['x'], parts_info['rightEye']['x']) / 2
 
         square = create_square(x_min, x_max, y_min, y_max, scale=1)
 
@@ -93,16 +89,18 @@ def get_face(pose_scores, keypoint_scores, keypoint_coords, image):
 def get_person(pose_scores, keypoint_scores, keypoint_coords, image):
     if len(pose_scores) > 0:
         pose_id = np.argmax(pose_scores)
-        parts_names = ['nose','leftEye','rightEye','leftEar','rightEar','leftShoulder','rightShoulder','leftElbow','rightElbow','leftWrist','rightWrist','leftHip','rightHip','leftKnee','rightKnee','leftAnkle','rightAnkle']
+        parts_names = ['nose', 'leftEye', 'rightEye', 'leftEar', 'rightEar', 'leftShoulder', 'rightShoulder',
+                       'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist', 'leftHip', 'rightHip', 'leftKnee',
+                       'rightKnee', 'leftAnkle', 'rightAnkle']
 
-        parts_coord = np.array(get_coord_skeleton(pose_id,keypoint_scores,keypoint_coords,parts_names))
+        parts_info = np.array(get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names))
 
-        xmin = min(parts_coord[:,1])
-        xmax = max(parts_coord[:,1])
-        ymin = min(parts_coord[:,0])
-        ymax = max(parts_coord[:,0])
+        x_min = min(parts_info[:]['x'])
+        x_max = max(parts_info[:]['x'])
+        y_min = min(parts_info[:]['y'])
+        y_max = max(parts_info[:]['y'])
 
-        square = create_square(xmin,xmax,ymin,ymax, scale=1)
+        square = create_square(x_min, x_max, y_min, y_max, scale=1)
 
         return crop_image(square, image)
 
@@ -111,40 +109,31 @@ def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords):
     if len(pose_scores) > 0:
         # Extract all pose and information used for the detection
         pose_id = np.argmax(pose_scores)
-        left_shoulder_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'leftShoulder')
-        right_shoulder_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'rightShoulder')
-        left_elbow_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'leftElbow')
-        right_elbow_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'rightElbow')
-        left_wrist_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'leftWrist')
-        right_wrist_info = \
-            get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, 'rightWrist')
+        parts_names = ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist']
+
+        parts_info = get_coord_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
         # get the best elbow and shoulder point
-        if left_shoulder_info['score'] > right_shoulder_info['score']:
-            y_shoulder = left_shoulder_info['y']
+        if parts_info['leftShoulder']['score'] > parts_info['rightShoulder']['score']:
+            y_shoulder = parts_info['leftShoulder']['y']
         else:
-            y_shoulder = right_shoulder_info['y']
+            y_shoulder = parts_info['rightShoulder']['y']
 
-        if left_elbow_info['score'] > right_elbow_info['score']:
-            y_elbow = left_elbow_info['y']
+        if parts_info['leftElbow']['score'] > parts_info['rightElbow']['score']:
+            y_elbow = parts_info['leftElbow']['y']
         else:
-            y_elbow = right_elbow_info['y']
+            y_elbow = parts_info['rightElbow']['y']
 
         # get the best valid wrist point
-        if left_wrist_info['y'] < y_elbow and right_wrist_info['y'] < y_elbow:
-            if left_wrist_info['score'] > right_wrist_info['score']:
-                y_wrist = left_wrist_info['y']
+        if parts_info['leftWrist']['y'] < y_elbow and parts_info['rightWrist']['y'] < y_elbow:
+            if parts_info['leftWrist']['score'] > parts_info['rightWrist']['score']:
+                y_wrist = parts_info['leftWrist']['y']
             else:
-                y_wrist = right_wrist_info['y']
-        elif left_wrist_info['y'] < y_elbow:
-            y_wrist = left_wrist_info['y']
-        elif right_wrist_info['y'] < y_elbow:
-            y_wrist = right_wrist_info['y']
+                y_wrist = parts_info['rightWrist']['y']
+        elif parts_info['leftWrist']['y'] < y_elbow:
+            y_wrist = parts_info['leftWrist']['y']
+        elif parts_info['rightWrist']['y'] < y_elbow:
+            y_wrist = parts_info['rightWrist']['y']
         else:
             return False
 

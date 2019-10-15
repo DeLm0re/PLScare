@@ -66,7 +66,6 @@ def main():
                 min_pose_score=0.15, min_part_score=0.1)
 
             cv2.imshow("posenet", overlay_image)
-
             frame_count += 1
 
             # check the 'q' key to end th eloop
