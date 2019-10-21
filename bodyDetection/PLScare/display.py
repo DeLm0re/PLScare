@@ -1,9 +1,10 @@
 import kivy
+from functools import partial
 from kivy.app import App
 from kivy.uix.button import Button
-from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.core.window import Window
+from kivy.uix.screenmanager import ScreenManager, Screen
 
 kivy.require('1.11.1')
 
@@ -13,16 +14,6 @@ def init_window(height, width):
     Window.size = (height, width)
 
 
-def run_app():
-    PlscareApp().run()
-
-
-class PlscareApp(App):
-
-    def build(self):
-        return PlscareLayout()
-
-
 class LogoImg(Image):
 
     def __init__(self, **kwargs):
@@ -30,6 +21,18 @@ class LogoImg(Image):
 
         # param for the image
         self.source = 'PLScare/assets/images/logo_PLScare.png'
+        self.size_hint = (None, None)
+        self.size_hint = 0.8, 0.8
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.7}
+
+
+class SolutionImg(Image):
+
+    def __init__(self, **kwargs):
+        super(SolutionImg, self).__init__(**kwargs)
+
+        # param for the image
+        self.source = 'PLScare/assets/situations/arret/arretcardiaque1_medium-187.png'
         self.size_hint = (None, None)
         self.size_hint = 0.8, 0.8
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.7}
@@ -52,24 +55,57 @@ class HubBtn(Button):
         self.background_down = 'PLScare/assets/images/grey.png'
 
 
-class PlscareLayout(FloatLayout):
+class FirstScreen(Screen):
 
     def __init__(self, **kwargs):
-        super(PlscareLayout, self).__init__(**kwargs)
+        super(Screen, self).__init__(**kwargs)
 
-        # init the window
-        init_window(600, 600)
-
-        # declaration des hub elements
+        # declaration des elements
         btn_hub = HubBtn()
         img_logo = LogoImg()
 
-        # event on hub button
-        btn_hub.bind(on_press=self.checkout)
+        # event on button
+        btn_hub.bind(on_press=self.changer)
 
-        # add element in layout
+        # add element in screen
         self.add_widget(btn_hub)
         self.add_widget(img_logo)
 
-    def checkout(self, value):
-        self.clear_widgets()
+    def changer(self, *args):
+        self.manager.current = '_second_screen_'
+
+
+class SecondScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(Screen, self).__init__(**kwargs)
+
+        # declaration des elements
+        img_logo = LogoImg()
+
+        # add element in screen
+        self.add_widget(img_logo)
+
+
+class ThirdScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(Screen, self).__init__(**kwargs)
+
+
+class PlscareApp(App):
+
+    def build(self):
+        # init the screen size
+        init_window(600, 600)
+
+        # init the screen manager
+        screen_manager = ScreenManager()
+        screen_manager.add_widget(FirstScreen(name='_first_screen_'))
+        screen_manager.add_widget(SecondScreen(name='_second_screen_'))
+        screen_manager.add_widget(ThirdScreen(name='_third_screen_'))
+        return screen_manager
+
+
+def run_app():
+    PlscareApp().run()
