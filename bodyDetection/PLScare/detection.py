@@ -191,4 +191,34 @@ def get_symptoms(keypoint_scores, keypoint_coords, image, window_height, window_
     symptoms["mouth_open"] = is_mouth_open(pose_id, keypoint_scores, keypoint_coords, image)
     symptoms["laying_on_ground"] = False
     symptoms["fast_cardiac_pace"] = False
+    symptoms["no_cardiac_pace"] = False
     return symptoms
+
+
+def get_diagnostic(symptoms):
+    diagnostic = dict()
+    diagnostic["Etouffement"] = \
+        symptoms["hand_near_throat"] + symptoms["mouth_open"] + \
+        (not symptoms["eyes_close"]) + \
+        symptoms["fast_cardiac_pace"] + \
+        (not symptoms["laying_on_ground"])
+
+    diagnostic["Saignement"] = \
+        (not symptoms["eyes_close"]) + \
+        symptoms["fast_cardiac_pace"] + \
+        1  # (whatever position)
+
+    diagnostic["Inconscient"] = \
+        symptoms["eyes_close"] + symptoms["laying_on_ground"] + \
+        (not symptoms["fast_cardiac_pace"] and not symptoms["no_cardiac_pace"])
+
+    diagnostic["Arret_cardiaque"] = \
+        (not symptoms["eyes_close"]) + symptoms["laying_on_ground"] + \
+        symptoms["no_cardiac_pace"]
+
+    diagnostic["Malaise_cardiaque"] = \
+        (not symptoms["eyes_close"]) + 1 + 1  # (whatever position) (whatever cardiac pace)
+
+    # si diagnostic["Saignement"] est le plus haut, demander confirmation
+
+    return diagnostic.index(max(diagnostic))
