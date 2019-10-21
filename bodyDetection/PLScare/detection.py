@@ -1,7 +1,8 @@
 import posenet
 import math
 import numpy as np
-
+import cv2
+import PLScare
 
 # Get the coordinate that describe the torso
 def get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, part_names):
@@ -68,9 +69,7 @@ def get_height_face(x_left_eye, x_right_eye):
     return height_face
 
 
-def get_body(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
-    if len(pose_scores) > 0:
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
+def get_body(pose_id, keypoint_scores, keypoint_coords, image, window_width, window_height):
         parts_names = ['leftShoulder', 'rightShoulder', 'leftHip', 'rightHip']
 
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
@@ -89,75 +88,106 @@ def get_body(pose_scores, keypoint_scores, keypoint_coords, image, window_width,
         return crop_image(square, image)
 
 
-def get_face(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
-    if len(pose_scores) > 0:
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
-        parts_names = ['leftEar', 'rightEar', 'leftEye', 'rightEye']
+def get_face(pose_id, keypoint_scores, keypoint_coords, image):
+    parts_names = ['leftEar', 'rightEar', 'leftEye', 'rightEye']
 
-        parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+    parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
-        x_min = parts_info['rightEar']['x']
-        x_max = parts_info['leftEar']['x']
-        y_min = parts_info['leftEye']['y']-get_height_face(parts_info['leftEye']['x'], parts_info['rightEye']['x']) / 2
-        y_max = parts_info['leftEye']['y']+get_height_face(parts_info['leftEye']['x'], parts_info['rightEye']['x']) / 2
+    x_min = parts_info['rightEar']['x']
+    x_max = parts_info['leftEar']['x']
+    y_min = parts_info['leftEye']['y']-get_height_face(parts_info['leftEye']['x'], parts_info['rightEye']['x']) / 2
+    y_max = parts_info['leftEye']['y']+get_height_face(parts_info['leftEye']['x'], parts_info['rightEye']['x']) / 2
 
-        square = create_square(x_min, x_max, y_min, y_max, scale=1)
+    square = create_square(x_min, x_max, y_min, y_max, scale=1)
 
-        return crop_image(square, image)
+    return crop_image(square, image)
 
 
-def get_person(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
-    if len(pose_scores) > 0:
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
-        parts_names = ['nose', 'leftEye', 'rightEye', 'leftEar', 'rightEar', 'leftShoulder', 'rightShoulder',
-                       'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist', 'leftHip', 'rightHip', 'leftKnee',
-                       'rightKnee', 'leftAnkle', 'rightAnkle']
+def get_person(pose_id, keypoint_scores, keypoint_coords, image):
+    parts_names = ['nose', 'leftEye', 'rightEye', 'leftEar', 'rightEar', 'leftShoulder', 'rightShoulder',
+                   'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist', 'leftHip', 'rightHip', 'leftKnee',
+                   'rightKnee', 'leftAnkle', 'rightAnkle']
 
-        parts_info = np.array(get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names))
+    parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
-        x_min = min(parts_info[:]['x'])
-        x_max = max(parts_info[:]['x'])
-        y_min = min(parts_info[:]['y'])
-        y_max = max(parts_info[:]['y'])
+    x_min = min(parts_info[:]['x'])
+    x_max = max(parts_info[:]['x'])
+    y_min = min(parts_info[:]['y'])
+    y_max = max(parts_info[:]['y'])
 
-        square = create_square(x_min, x_max, y_min, y_max, scale=1)
+    square = create_square(x_min, x_max, y_min, y_max, scale=1)
 
-        return crop_image(square, image)
+    return crop_image(square, image)
 
 
-def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords, window_width, window_height):
-    if len(pose_scores) > 0:
-        # Extract all pose and information used for the detection
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
-        parts_names = ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist']
+def is_hand_near_throat(pose_id, keypoint_scores, keypoint_coords):
+    # Extract all information used for the detection
+    parts_names = ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist']
+    parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
-        parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+    # get the best elbow and shoulder point
+    if parts_info['leftShoulder']['score'] > parts_info['rightShoulder']['score']:
+        y_shoulder = parts_info['leftShoulder']['y']
+    else:
+        y_shoulder = parts_info['rightShoulder']['y']
 
-        # get the best elbow and shoulder point
-        if parts_info['leftShoulder']['score'] > parts_info['rightShoulder']['score']:
-            y_shoulder = parts_info['leftShoulder']['y']
-        else:
-            y_shoulder = parts_info['rightShoulder']['y']
+    if parts_info['leftElbow']['score'] > parts_info['rightElbow']['score']:
+        y_elbow = parts_info['leftElbow']['y']
+    else:
+        y_elbow = parts_info['rightElbow']['y']
 
-        if parts_info['leftElbow']['score'] > parts_info['rightElbow']['score']:
-            y_elbow = parts_info['leftElbow']['y']
-        else:
-            y_elbow = parts_info['rightElbow']['y']
-
-        # get the best valid wrist point
-        if parts_info['leftWrist']['y'] < y_elbow and parts_info['rightWrist']['y'] < y_elbow:
-            if parts_info['leftWrist']['score'] > parts_info['rightWrist']['score']:
-                y_wrist = parts_info['leftWrist']['y']
-            else:
-                y_wrist = parts_info['rightWrist']['y']
-        elif parts_info['leftWrist']['y'] < y_elbow:
+    # get the best valid wrist point
+    if parts_info['leftWrist']['y'] < y_elbow and parts_info['rightWrist']['y'] < y_elbow:
+        if parts_info['leftWrist']['score'] > parts_info['rightWrist']['score']:
             y_wrist = parts_info['leftWrist']['y']
-        elif parts_info['rightWrist']['y'] < y_elbow:
-            y_wrist = parts_info['rightWrist']['y']
         else:
-            return False
+            y_wrist = parts_info['rightWrist']['y']
+    elif parts_info['leftWrist']['y'] < y_elbow:
+        y_wrist = parts_info['leftWrist']['y']
+    elif parts_info['rightWrist']['y'] < y_elbow:
+        y_wrist = parts_info['rightWrist']['y']
+    else:
+        return False
 
-        if np.abs(y_shoulder-y_wrist) > np.abs(y_elbow-y_wrist):
-            return False
+    if np.abs(y_shoulder-y_wrist) > np.abs(y_elbow-y_wrist):
+        return False
 
     return True
+
+
+def is_mouth_open(pose_id, keypoint_scores, keypoint_coords, image):
+    parts_names = ['nose', 'leftEar', 'rightEar', 'leftEye', 'rightEye']
+    parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+    x_left_ear = parts_info['leftEar']['x']
+    x_right_ear = parts_info['rightEar']['x']
+    y_nose = parts_info['nose']['y']
+
+    y_max = parts_info['leftEye']['y'] + get_height_face(parts_info['leftEye']['x'], parts_info['rightEye']['x']) / 2
+    y_min = y_nose + np.abs(y_max - y_nose)/2
+    x_min = x_right_ear + np.abs(x_left_ear - x_right_ear)/3
+    x_max = x_left_ear - np.abs(x_left_ear - x_right_ear)/3
+    square = create_square(x_min, x_max, y_min, y_max, scale=1)
+    image_mouth = crop_image(square, image)
+
+    hsv = cv2.cvtColor(image_mouth, cv2.COLOR_BGR2HSV)
+    average_value = np.average(hsv[:, :, 2])
+
+    image_face = get_face(pose_id, keypoint_scores, keypoint_coords, image)
+    base_value = PLScare.image_treatment.get_average_value(image_face)
+
+    if np.abs(base_value - average_value) > 15:
+        return True
+    else:
+        return False
+
+
+def get_symptoms(keypoint_scores, keypoint_coords, image, window_height, window_width):
+    symptoms = dict()
+    pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_height, window_width)
+
+    symptoms["hand_near_throat"] = is_hand_near_throat(pose_id, keypoint_scores, keypoint_coords)
+    symptoms["eyes_close"] = False
+    symptoms["mouth_open"] = is_mouth_open(pose_id, keypoint_scores, keypoint_coords, image)
+    symptoms["laying_on_ground"] = False
+    symptoms["fast_cardiac_pace"] = False
+    return symptoms
