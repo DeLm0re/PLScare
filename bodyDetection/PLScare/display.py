@@ -13,25 +13,43 @@ def init_window(height, width):
     Window.size = (height, width)
 
 
-def on_event(obj):
-    print('Typical event from', obj)
+def run_app():
+    PlscareApp().run()
 
 
-def on_property(obj, value):
-    print('Typical property change from', obj, 'to', value)
+class PlscareApp(App):
 
-
-def on_anything(*args, **kwargs):
-    print('The flexible function has *args of', str(args),
-          'and **kwargs of', str(kwargs))
+    def build(self):
+        return PlscareLayout()
 
 
 class LogoImg(Image):
-    pass
+
+    def __init__(self, **kwargs):
+        super(LogoImg, self).__init__(**kwargs)
+
+        # param for the image
+        self.source = 'PLScare/assets/images/logo_PLScare.png'
+        self.size_hint = (None, None)
+        self.size_hint = 0.8, 0.8
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.7}
 
 
 class HubBtn(Button):
-    pass
+
+    def __init__(self, **kwargs):
+        super(HubBtn, self).__init__(**kwargs)
+
+        # param for the button
+        self.text = 'Start recording'
+        self.size_hint = (None, None)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.3}
+        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_size = 50
+        self.color = 1, 0, 0, 1
+        self.padding = (30, 10)
+        self.background_normal = ''
+        self.background_down = 'PLScare/assets/images/grey.png'
 
 
 class PlscareLayout(FloatLayout):
@@ -47,18 +65,11 @@ class PlscareLayout(FloatLayout):
         img_logo = LogoImg()
 
         # event on hub button
-        btn_hub.bind(on_press=on_event)
+        btn_hub.bind(on_press=self.checkout)
 
         # add element in layout
-        # check .kv file
         self.add_widget(btn_hub)
         self.add_widget(img_logo)
 
-
-class PlscareApp(App):
-    def build(self):
-        return PlscareLayout()
-
-
-def run_app():
-    PlscareApp().run()
+    def checkout(self, value):
+        self.clear_widgets()
