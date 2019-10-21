@@ -68,9 +68,8 @@ def get_height_face(x_left_eye, x_right_eye):
     return height_face
 
 
-def get_body(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
-    if len(pose_scores) > 0:
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
+def get_body(pose_id, keypoint_scores, keypoint_coords, image, window_width, window_height):
+    if len(pose_id) > 0:
         parts_names = ['leftShoulder', 'rightShoulder', 'leftHip', 'rightHip']
 
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
@@ -89,9 +88,8 @@ def get_body(pose_scores, keypoint_scores, keypoint_coords, image, window_width,
         return crop_image(square, image)
 
 
-def get_face(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
-    if len(pose_scores) > 0:
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
+def get_face(pose_id, keypoint_scores, keypoint_coords, image):
+    if len(pose_id) > 0:
         parts_names = ['leftEar', 'rightEar', 'leftEye', 'rightEye']
 
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
@@ -106,9 +104,8 @@ def get_face(pose_scores, keypoint_scores, keypoint_coords, image, window_width,
         return crop_image(square, image)
 
 
-def get_person(pose_scores, keypoint_scores, keypoint_coords, image, window_width, window_height):
-    if len(pose_scores) > 0:
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
+def get_person(pose_id, keypoint_scores, keypoint_coords, image):
+    if len(pose_id) > 0:
         parts_names = ['nose', 'leftEye', 'rightEye', 'leftEar', 'rightEar', 'leftShoulder', 'rightShoulder',
                        'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist', 'leftHip', 'rightHip', 'leftKnee',
                        'rightKnee', 'leftAnkle', 'rightAnkle']
@@ -125,12 +122,10 @@ def get_person(pose_scores, keypoint_scores, keypoint_coords, image, window_widt
         return crop_image(square, image)
 
 
-def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords, window_width, window_height):
-    if len(pose_scores) > 0:
-        # Extract all pose and information used for the detection
-        pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_width, window_height)
+def is_hand_near_throat(pose_id, keypoint_scores, keypoint_coords):
+    if len(pose_id) > 0:
+        # Extract all information used for the detection
         parts_names = ['leftShoulder', 'rightShoulder', 'leftElbow', 'rightElbow', 'leftWrist', 'rightWrist']
-
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
 
         # get the best elbow and shoulder point
@@ -161,3 +156,19 @@ def is_hand_near_throat(pose_scores, keypoint_scores, keypoint_coords, window_wi
             return False
 
     return True
+
+
+def is_mouth_open_throat(pose_id, keypoint_scores, keypoint_coords):
+    return False
+
+
+def get_symptoms(pose_scores, keypoint_scores, keypoint_coords, image, window_height, window_width):
+    symptoms = dict()
+    pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_height, window_width)
+
+    symptoms["hand_near_throat"] = is_hand_near_throat(pose_id, keypoint_scores, keypoint_coords)
+    symptoms["eyes_close"] = False
+    symptoms["mouth_open"] = False
+    symptoms["laying_on_ground"] = False
+    symptoms["fast_cardiac_pace"] = False
+    return symptoms
