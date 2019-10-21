@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import PLScare
 
+
 # Get the coordinate that describe the torso
 def get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, part_names):
     total_info = dict()
@@ -69,7 +70,7 @@ def get_height_face(x_left_eye, x_right_eye):
     return height_face
 
 
-def get_body(pose_id, keypoint_scores, keypoint_coords, image, window_width, window_height):
+def get_body(pose_id, keypoint_scores, keypoint_coords, image):
         parts_names = ['leftShoulder', 'rightShoulder', 'leftHip', 'rightHip']
 
         parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
