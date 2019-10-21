@@ -14,16 +14,6 @@ def init_window(height, width):
     Window.size = (height, width)
 
 
-def run_app():
-    PlscareApp().run()
-
-
-class PlscareApp(App):
-
-    def build(self):
-        return PLScareManager()
-
-
 class LogoImg(Image):
 
     def __init__(self, **kwargs):
@@ -70,25 +60,31 @@ class FirstScreen(Screen):
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
 
-        # init the screen size
-        init_window(600, 600)
-
         # declaration des elements
         btn_hub = HubBtn()
         img_logo = LogoImg()
 
         # event on button
-        btn_hub.bind(on_press=partial(switch_screen, '_second_screen_'))
+        btn_hub.bind(on_press=self.changer)
 
         # add element in screen
         self.add_widget(btn_hub)
         self.add_widget(img_logo)
+
+    def changer(self, *args):
+        self.manager.current = '_second_screen_'
 
 
 class SecondScreen(Screen):
 
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
+
+        # declaration des elements
+        img_logo = LogoImg()
+
+        # add element in screen
+        self.add_widget(img_logo)
 
 
 class ThirdScreen(Screen):
@@ -97,13 +93,19 @@ class ThirdScreen(Screen):
         super(Screen, self).__init__(**kwargs)
 
 
-class PLScareManager(ScreenManager):
+class PlscareApp(App):
 
-    def __init__(self, **kwargs):
-        super(PLScareManager, self).__init__(**kwargs)
-        switch_screen('_first_screen_')
+    def build(self):
+        # init the screen size
+        init_window(600, 600)
+
+        # init the screen manager
+        screen_manager = ScreenManager()
+        screen_manager.add_widget(FirstScreen(name='_first_screen_'))
+        screen_manager.add_widget(SecondScreen(name='_second_screen_'))
+        screen_manager.add_widget(ThirdScreen(name='_third_screen_'))
+        return screen_manager
 
 
-def switch_screen(screen_name, *args):
-    print(screen_name)
-    PLScareManager.current = screen_name
+def run_app():
+    PlscareApp().run()
