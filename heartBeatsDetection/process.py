@@ -3,8 +3,8 @@ from scipy.fftpack import fft
 import cv2
 import matplotlib.pyplot as plt
 
-import skinMask
-
+#import skinMask
+import RGBtoHSV
 
 # List of average hue for each frame
 meanHues = []
@@ -13,7 +13,6 @@ recordedFrames = 0
 # Output videos names
 videoName = 'originalVideo.avi'
 skinName = 'skinMask.avi'
-
 
 print('Processing...')
 cap = cv2.VideoCapture(videoName)
@@ -31,13 +30,16 @@ while cap.isOpened():
     ret, frame = cap.read()
     if ret:
 
-        # get average HSV frame and skin detection frame
-        #frame = cv2.fastNlMeansDenoisingColored(frame, None, 10, 10, 7, 21)
-        hsvFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        skin = skinMask.getSkin(frame, hsvFrame)
+        x = 300
+        y = 150
+        w = 100
+        h = 50
+        roi = frame[y:y + h, x:x + w]
+        #roi = cv2.fastNlMeansDenoisingColored(roi, None, 10, 10, 7, 21)
+        #hsvRoi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+        [hues, _, _] = RGBtoHSV.RGBimageToHSV(roi)
 
-        # get average Hue value for the pixels of skin
-        hues = skin[:, :, 0]
+        cv2.imshow('frame', roi)
 
         # Save the average hues
         meanHues.append(np.mean(hues))
@@ -59,8 +61,7 @@ T = 1.0/fps
 f = 1.0/(2.0*T)
 
 x = np.linspace(0.0, N*T, N)
-y = np.diff(meanHues)/np.diff(x)
-x = x[:-1]
+y = meanHues
 
 plt.plot(x, y)
 plt.title("Average Hues per frame")
@@ -73,7 +74,10 @@ xf = xf[:-1]
 yf = fft(y)
 yf = yf[N//2:N//2 + len(xf)]
 
-plt.plot(xf, yf)
+# Band-pass filter to the interesting frequencies
+HRindex = (xf >= 0.2) & (xf <= 4.0)
+
+plt.plot(xf[HRindex], yf[HRindex])
 plt.title("FFT")
 plt.xlabel("Hz")
 plt.show()
