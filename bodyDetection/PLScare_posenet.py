@@ -37,6 +37,9 @@ def main():
         start = time.time()
         frame_count = 0
 
+        # diagnostic init
+        symptoms = PLScare.detection.create_symptoms_dict()
+
         # main loop
         while True:
             # read an image from the capture device or video
@@ -68,12 +71,21 @@ def main():
             pose_id = PLScare.detection.get_pose_id_closest_to_center(
                 keypoint_scores, keypoint_coords, args.cam_height, args.cam_width)
             cv2.imshow("PLScare", overlay_image)
+            # --- Do measurement here
+            # Count each frame where the mouth/eyes were close, where the person was on the ground,
+            # or where the hand was near the throat
+            # Measure the red variation of the forehead for the cardiac pace
             frame_count += 1
 
             # check the 'q' key to end the loop
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
+        # --- Estimate symptoms here
+        # Do an average for the mouth/eyes open, for the person being on the ground and
+        # for the hand being near the throat
+        # Analyze the red variation of the forehead to get the cardiac pace, and check if it's fast, slow,
+        # or if their is none
         cap.release()
         cv2.destroyAllWindows()
 

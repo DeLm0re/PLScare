@@ -207,22 +207,20 @@ def is_mouth_open(pose_id, keypoint_scores, keypoint_coords, image):
         return False
 
 
-# Get the different symptoms of a person based on a posenet skeleton
-def get_symptoms(keypoint_scores, keypoint_coords, image, window_height, window_width):
+# Create a dictionary of symptoms
+def create_symptoms_dict():
     symptoms = dict()
-    pose_id = get_pose_id_closest_to_center(keypoint_scores, keypoint_coords, window_height, window_width)
-
-    symptoms["hand_near_throat"] = is_hand_near_throat(pose_id, keypoint_scores, keypoint_coords)
-    symptoms["eyes_close"] = False
-    symptoms["mouth_open"] = is_mouth_open(pose_id, keypoint_scores, keypoint_coords, image)
-    symptoms["laying_on_ground"] = False
-    symptoms["fast_cardiac_pace"] = False
-    symptoms["no_cardiac_pace"] = False
+    symptoms["hand_near_throat"] = 0.
+    symptoms["eyes_close"] = 0.
+    symptoms["mouth_open"] = 0.
+    symptoms["laying_on_ground"] = 0.
+    symptoms["fast_cardiac_pace"] = 0.
+    symptoms["no_cardiac_pace"] = 0.
     return symptoms
 
 
 # Get the diagnostic of a person based on his symptoms
-# Each symptoms could be a percentage
+# Each symptoms should be a percentage
 def get_diagnostics(symptoms):
     diagnostic = dict()
     diagnostic["Etouffement"] = \
