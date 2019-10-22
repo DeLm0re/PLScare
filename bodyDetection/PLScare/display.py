@@ -15,6 +15,10 @@ def init_window(height, width):
     Window.size = (height, width)
 
 
+def switch_screen(self, screen_name, *args):
+    self.manager.current = screen_name
+
+
 class LogoImg(Image):
 
     def __init__(self, **kwargs):
@@ -113,14 +117,11 @@ class FirstScreen(Screen):
         img_logo = LogoImg()
 
         # event on button
-        btn_hub.bind(on_press=self.changer)
+        btn_hub.bind(on_press=partial(switch_screen, self, '_second_screen_'))
 
         # add element in screen
         self.add_widget(btn_hub)
         self.add_widget(img_logo)
-
-    def changer(self, *args):
-        self.manager.current = '_second_screen_'
 
 
 class SecondScreen(Screen):
