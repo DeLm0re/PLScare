@@ -10,6 +10,10 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 
 kivy.require('1.11.1')
 
+# -------------------------------------------------------------------------------------------------------------
+# -------------------------------------    FUNCTION DEFINITION    ---------------------------------------------
+# -------------------------------------------------------------------------------------------------------------
+
 
 def init_window(height, width):
     Window.clearcolor = (1, 1, 1, 1)
@@ -18,6 +22,11 @@ def init_window(height, width):
 
 def switch_screen(self, screen_name, *args):
     self.manager.current = screen_name
+
+
+def setup_solution(screen, situation_name):
+    add_solutions_icons(screen, situation_name)
+    add_solutions_labels(screen, situation_name)
 
 
 def add_solutions_icons(screen, situation_name):
@@ -34,15 +43,20 @@ def add_solutions_icons(screen, situation_name):
 
 
 def add_solutions_labels(screen, situation_name):
-    # déclaration du fichier de solution
+    # declaration du fichier de solution
     file = open('PLScare/assets/solutions/' + situation_name + '.txt', 'r')
     lines = file.readlines()
     nbr_lines = len(lines)
 
     # pour chaque ligne du fichier
     for index_sol in range(0, nbr_lines):
-        sol_label = SolutionLabel(lines[index_sol], 0.5, index_sol / (nbr_lines + 1) + 0.1)
+        sol_label = SolutionLabel(lines[index_sol], 0.6, index_sol / (nbr_lines + 1) + 0.1)
         screen.add_widget(sol_label)
+
+
+# -------------------------------------------------------------------------------------------------------------
+# ---------------------------------------    CLASS DEFINITION    ----------------------------------------------
+# -------------------------------------------------------------------------------------------------------------
 
 
 class LogoImg(Image):
@@ -152,8 +166,7 @@ class ThirdScreen(Screen):
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
 
-        add_solutions_icons(self, 'saignement')
-        add_solutions_labels(self, 'saignement')
+        setup_solution(self, 'arret')
 
 
 class PlscareApp(App):
