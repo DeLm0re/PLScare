@@ -32,9 +32,17 @@ while cap.isOpened():
         hsvFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         skin = skinMask.getSkin(frame, hsvFrame)
 
+        x = 300
+        y = 150
+        w = 100
+        h = 50
+        roi = frame[y:y + h, x:x + w]
+        hsvRoi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+        s = skinMask.getSkin(roi, hsvRoi)
+        cv2.imshow('frame', np.hstack([roi, s]))
 
         # show the skin in the image along with the mask
-        cv2.imshow('frame', np.hstack([frame, skin]))
+        #cv2.imshow('frame', np.hstack([frame, skin]))
 
         # Write frame
         if recordedFrame > 50 :
