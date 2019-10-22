@@ -25,11 +25,14 @@ def main():
         model_cfg, model_outputs = posenet.load_model(args.model, sess)
         output_stride = model_cfg['output_stride']
 
-        # video init
+        # Use the video given as an argument or record one
         if args.file is not None:
             cap = cv2.VideoCapture(args.file)
         else:
-            cap = cv2.VideoCapture(args.cam_id)
+            PLScare.video_acquisition.start_recording("video/video0", args.cam_id)
+            cap = cv2.VideoCapture("video/video0.avi")
+        # video parameter
+        total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         cap.set(3, args.cam_width)
         cap.set(4, args.cam_height)
 
@@ -40,8 +43,12 @@ def main():
         # diagnostic init
         symptoms = PLScare.detection.create_symptoms_dict()
 
-        # main loop
-        while True:
+        # --- Do coco treatment here
+        # Get if the subject is laying on the floor and rotate the video if necessary to get better treatment results
+        # (most treatment works only on standing up person)
+
+        # posenet treatment loop
+        while frame_count < total_frame:
             # read an image from the capture device or video
             input_image, display_image, output_scale = posenet.read_cap(
                 cap, scale_factor=args.scale_factor, output_stride=output_stride)
@@ -69,11 +76,10 @@ def main():
                 min_pose_score=0.15, min_part_score=0.1)
 
             pose_id = PLScare.detection.get_pose_id_closest_to_center(
-                keypoint_scores, keypoint_coords, args.cam_height, args.cam_width)
+                keypoint_scores, keypoint_coords, display_image.shape[0], display_image.shape[1])
             cv2.imshow("PLScare", overlay_image)
             # --- Do measurement here
-            # Count each frame where the mouth/eyes were close, where the person was on the ground,
-            # or where the hand was near the throat
+            # Count each frame where the mouth/eyes were close or where the hand was near the throat
             # Measure the red variation of the forehead for the cardiac pace
             frame_count += 1
 

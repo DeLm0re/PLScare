@@ -1,12 +1,13 @@
 import numpy as np
 import cv2
 
-def start_recording(videoName):
+
+def start_recording(videoName, cam_id):
 
     videoName = videoName + '.avi'
 
-    # Create a capture object wired on the default webcam (0)
-    cap = cv2.VideoCapture(0)
+    # Create a capture object wired on the default webcam (cam_id)
+    cap = cv2.VideoCapture(cam_id)
 
     # Define the codec and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
