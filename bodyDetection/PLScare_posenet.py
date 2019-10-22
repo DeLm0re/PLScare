@@ -21,10 +21,6 @@ args = parser.parse_args()
 
 def main():
     with tf.Session() as sess:
-        # posenet init
-        model_cfg, model_outputs = posenet.load_model(args.model, sess)
-        output_stride = model_cfg['output_stride']
-
         # Use the video given as an argument or record one
         if args.file is not None:
             cap = cv2.VideoCapture(args.file)
@@ -47,6 +43,9 @@ def main():
         # Get if the subject is laying on the floor and rotate the video if necessary to get better treatment results
         # (most treatment works only on standing up person)
 
+        # posenet init
+        model_cfg, model_outputs = posenet.load_model(args.model, sess)
+        output_stride = model_cfg['output_stride']
         # posenet treatment loop
         while frame_count < total_frame:
             # read an image from the capture device or video
