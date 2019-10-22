@@ -65,6 +65,8 @@ def main():
                 display_image, pose_scores, keypoint_scores, keypoint_coords,
                 min_pose_score=0.15, min_part_score=0.1)
 
+            pose_id = PLScare.detection.get_pose_id_closest_to_center(
+                keypoint_scores, keypoint_coords, args.cam_height, args.cam_width)
             cv2.imshow("PLScare", overlay_image)
             frame_count += 1
 
