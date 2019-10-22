@@ -4,6 +4,7 @@ from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.core.window import Window
+from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 
 kivy.require('1.11.1')
@@ -55,6 +56,53 @@ class HubBtn(Button):
         self.background_down = 'PLScare/assets/images/grey.png'
 
 
+class AskLabel(Label):
+
+    def __init__(self, **kwargs):
+        super(AskLabel, self).__init__(**kwargs)
+
+        # param for the label
+        self.text = 'La victime présente elle des signes de saignements ?'
+        self.color = 1, 0, 0, 1
+        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_size = 40
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.8}
+
+
+class YesBtn(Button):
+
+    def __init__(self, **kwargs):
+        super(YesBtn, self).__init__(**kwargs)
+
+        # param for the button
+        self.text = 'Oui'
+        self.size_hint = (None, None)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_size = 40
+        self.color = 1, 0, 0, 1
+        self.padding = (30, 10)
+        self.background_normal = ''
+        self.background_down = 'PLScare/assets/images/grey.png'
+
+
+class NoBtn(Button):
+
+    def __init__(self, **kwargs):
+        super(NoBtn, self).__init__(**kwargs)
+
+        # param for the button
+        self.text = 'Non'
+        self.size_hint = (None, None)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.2}
+        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_size = 40
+        self.color = 1, 0, 0, 1
+        self.padding = (30, 10)
+        self.background_normal = ''
+        self.background_down = 'PLScare/assets/images/grey.png'
+
+
 class FirstScreen(Screen):
 
     def __init__(self, **kwargs):
@@ -81,10 +129,14 @@ class SecondScreen(Screen):
         super(Screen, self).__init__(**kwargs)
 
         # declaration des elements
-        img_logo = LogoImg()
+        ask_label = AskLabel()
+        yes_btn = YesBtn()
+        no_btn = NoBtn()
 
         # add element in screen
-        self.add_widget(img_logo)
+        self.add_widget(ask_label)
+        self.add_widget(yes_btn)
+        self.add_widget(no_btn)
 
 
 class ThirdScreen(Screen):
