@@ -166,7 +166,7 @@ class ThirdScreen(Screen):
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
 
-        setup_solution(self, 'arret')
+        setup_solution(self, 'Arret_cardiaque')
 
 
 class PlscareApp(App):
