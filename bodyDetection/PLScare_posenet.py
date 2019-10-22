@@ -94,6 +94,7 @@ def main():
         # or if their is none
         cap.release()
         cv2.destroyAllWindows()
+        PLScare.run_app()
 
 
 if __name__ == "__main__":
