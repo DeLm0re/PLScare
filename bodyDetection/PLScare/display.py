@@ -1,4 +1,5 @@
 import kivy
+import os
 from functools import partial
 from kivy.app import App
 from kivy.uix.button import Button
@@ -17,6 +18,31 @@ def init_window(height, width):
 
 def switch_screen(self, screen_name, *args):
     self.manager.current = screen_name
+
+
+def add_solutions_icons(screen, situation_name):
+    # declaration de la liste des images
+    path = 'PLScare/assets/icons/' + situation_name
+    list_sol = sorted(os.listdir(path))
+    total_sol = len(list_sol)
+
+    # pour toutes les images de solution
+    for index_sol in range(0, total_sol):
+        # add element in screen
+        sol_img = SolutionImg(path + '/' + list_sol[index_sol], 0.1, index_sol / (total_sol + 1) + 0.1)
+        screen.add_widget(sol_img)
+
+
+def add_solutions_labels(screen, situation_name):
+    # déclaration du fichier de solution
+    file = open('PLScare/assets/solutions/' + situation_name + '.txt', 'r')
+    lines = file.readlines()
+    nbr_lines = len(lines)
+
+    # pour chaque ligne du fichier
+    for index_sol in range(0, nbr_lines):
+        sol_label = SolutionLabel(lines[index_sol], 0.5, index_sol / (nbr_lines + 1) + 0.1)
+        screen.add_widget(sol_label)
 
 
 class LogoImg(Image):
@@ -38,8 +64,19 @@ class SolutionImg(Image):
 
         # param for the image
         self.source = path
-        self.size_hint = (None, None)
-        self.size_hint = 0.8, 0.8
+        self.pos_hint = {'center_x': x, 'center_y': y}
+
+
+class SolutionLabel(Label):
+
+    def __init__(self, text, x, y, **kwargs):
+        super(SolutionLabel, self).__init__(**kwargs)
+
+        # param for the label
+        self.text = text
+        self.color = 0, 0, 0, 1
+        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_size = 14
         self.pos_hint = {'center_x': x, 'center_y': y}
 
 
@@ -115,11 +152,8 @@ class ThirdScreen(Screen):
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
 
-        # declaration des elements
-        sol_img = SolutionImg('PLScare/assets/situations/arret/arretcardiaque1_medium-187.png', 0.1, 0.5)
-
-        # add element in screen
-        self.add_widget(sol_img)
+        add_solutions_icons(self, 'saignement')
+        add_solutions_labels(self, 'saignement')
 
 
 class PlscareApp(App):
