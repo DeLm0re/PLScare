@@ -3,7 +3,6 @@ from scipy.fftpack import fft
 import cv2
 import matplotlib.pyplot as plt
 
-#import skinMask
 import RGBtoHSV
 
 # List of average hue for each frame
@@ -12,13 +11,13 @@ meanHues = []
 recordedFrames = 0
 # Output videos names
 videoName = 'originalVideo.avi'
-skinName = 'skinMask.avi'
 
 print('Processing...')
 cap = cv2.VideoCapture(videoName)
 
 # Find OpenCV version
 (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
+# Get frame per seconds
 if int(major_ver) < 3:
     fps = cap.get(cv2.cv.CV_CAP_PROP_FPS)
 else:
@@ -30,11 +29,13 @@ while cap.isOpened():
     ret, frame = cap.read()
     if ret:
 
+        # Temporary Region Of Interest to target forehead
         x = 300
         y = 150
         w = 100
         h = 50
         roi = frame[y:y + h, x:x + w]
+
         #roi = cv2.fastNlMeansDenoisingColored(roi, None, 10, 10, 7, 21)
         #hsvRoi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
         [hues, _, _] = RGBtoHSV.RGBimageToHSV(roi)
@@ -56,6 +57,7 @@ while cap.isOpened():
 cap.release()
 cv2.destroyAllWindows()
 
+# Plot data
 N = recordedFrames
 T = 1.0/fps
 f = 1.0/(2.0*T)
