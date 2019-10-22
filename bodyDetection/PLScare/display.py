@@ -68,7 +68,7 @@ class LogoImg(Image):
         self.source = 'PLScare/assets/images/logo_PLScare.png'
         self.size_hint = (None, None)
         self.size_hint = 0.8, 0.8
-        self.pos_hint = {'center_x': 0.5, 'center_y': 0.7}
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
 
 
 class SolutionImg(Image):
@@ -130,14 +130,18 @@ class FirstScreen(Screen):
         super(Screen, self).__init__(**kwargs)
 
         # declaration des elements
-        btn_hub = CustomBtn(0.5, 0.3, 'Enregistrer', 50)
+        record_btn = CustomBtn(0.5, 0.4, 'Enregistrer', 45)
+        video_btn = CustomBtn(0.5, 0.15, 'Video', 45)
+
         img_logo = LogoImg()
 
         # event on button
-        btn_hub.bind(on_press=partial(switch_screen, self, '_second_screen_'))
+        record_btn.bind(on_press=partial(switch_screen, self, '_second_screen_'))
+        video_btn.bind(on_press=partial(switch_screen, self, '_second_screen_'))
 
         # add element in screen
-        self.add_widget(btn_hub)
+        self.add_widget(record_btn)
+        self.add_widget(video_btn)
         self.add_widget(img_logo)
 
 
@@ -166,6 +170,7 @@ class ThirdScreen(Screen):
     def __init__(self, **kwargs):
         super(Screen, self).__init__(**kwargs)
 
+        # example of a situation
         setup_solution(self, 'Arret_cardiaque')
 
 
