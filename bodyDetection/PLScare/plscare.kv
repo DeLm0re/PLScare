@@ -1,4 +1,4 @@
-<HubBtn>:
+<CustomBtn>:
     canvas.before:
         Color:
             rgba: 1, 0, 0, 1
@@ -6,3 +6,15 @@
             width: 5
             rectangle: self.x, self.y, self.width, self.height
     size: self.texture_size
+
+<AskLabel>:
+    size_hint_y: None
+    height: self.texture_size[1]
+    text_size: (self.width-200), None
+    halign: 'center'
+    valign: 'middle'
+
+<SolutionLabel>:
+    text_size: 600, None
+    halign: 'left'
+    valign: 'middle'
