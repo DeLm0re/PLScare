@@ -2,7 +2,7 @@ import posenet
 import math
 import numpy as np
 import cv2
-import PLScare
+import custom
 
 
 # Get the coordinate that describe the torso
@@ -199,7 +199,7 @@ def is_mouth_open(pose_id, keypoint_scores, keypoint_coords, image):
     average_value = np.average(hsv[:, :, 2])
 
     image_face = get_face(pose_id, keypoint_scores, keypoint_coords, image)
-    base_value = PLScare.image_treatment.get_average_value(image_face)
+    base_value = custom.image_treatment.get_average_value(image_face)
 
     if np.abs(base_value - average_value) > 15:
         return True

@@ -31,7 +31,7 @@ def setup_solution(screen, situation_name):
 
 def add_solutions_icons(screen, situation_name):
     # declaration de la liste des images
-    path = 'PLScare/assets/icons/' + situation_name
+    path = 'custom/assets/icons/' + situation_name
     list_sol = sorted(os.listdir(path))
     total_sol = len(list_sol)
 
@@ -44,7 +44,7 @@ def add_solutions_icons(screen, situation_name):
 
 def add_solutions_labels(screen, situation_name):
     # declaration du fichier de solution
-    file = open('PLScare/assets/solutions/' + situation_name + '.txt', 'r')
+    file = open('custom/assets/solutions/' + situation_name + '.txt', 'r')
     lines = file.readlines()
     nbr_lines = len(lines)
 
@@ -65,7 +65,7 @@ class LogoImg(Image):
         super(LogoImg, self).__init__(**kwargs)
 
         # param for the image
-        self.source = 'PLScare/assets/images/logo_PLScare.png'
+        self.source = 'custom/assets/images/logo_PLScare.png'
         self.size_hint = (None, None)
         self.size_hint = 0.8, 0.8
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.75}
@@ -89,7 +89,7 @@ class SolutionLabel(Label):
         # param for the label
         self.text = text
         self.color = 0, 0, 0, 1
-        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_name = 'custom/assets/fonts/OpenSans-Bold.ttf'
         self.font_size = 14
         self.pos_hint = {'center_x': x, 'center_y': y}
 
@@ -102,7 +102,7 @@ class AskLabel(Label):
         # param for the label
         self.text = 'La victime présente-t-elle des signes de saignements ?'
         self.color = 1, 0, 0, 1
-        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_name = 'custom/assets/fonts/OpenSans-Bold.ttf'
         self.font_size = 40
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.8}
 
@@ -116,12 +116,12 @@ class CustomBtn(Button):
         self.text = text
         self.size_hint = (None, None)
         self.pos_hint = {'center_x': x, 'center_y': y}
-        self.font_name = 'PLScare/assets/fonts/OpenSans-Bold.ttf'
+        self.font_name = 'custom/assets/fonts/OpenSans-Bold.ttf'
         self.font_size = size
         self.color = 1, 0, 0, 1
         self.padding = (30, 10)
         self.background_normal = ''
-        self.background_down = 'PLScare/assets/images/grey.png'
+        self.background_down = 'custom/assets/images/grey.png'
 
 
 class FirstScreen(Screen):
