@@ -60,10 +60,10 @@ def handle_person_detection(frame, detections):
     return cropped_frame
 
 
-def main_person_detection(cap):
+def person_detection_module(cap):
     # load our serialized model from disk
-    net = cv2.dnn.readNetFromCaffe("../assets/caffe_models/MobileNetSSD_deploy.prototxt.txt",
-                                   "../assets/caffe_models/MobileNetSSD_deploy.caffemodel")
+    net = cv2.dnn.readNetFromCaffe("custom/assets/caffe_models/MobileNetSSD_deploy.prototxt.txt",
+                                   "custom/assets/caffe_models/MobileNetSSD_deploy.caffemodel")
 
     frame_count = 0
     total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -73,7 +73,9 @@ def main_person_detection(cap):
     while frame_count < total_frame:
         # grab the frame from the threaded video stream and resize it
         # to have a maximum width of 400 pixels
-        frame = cap.read()
+        res, frame = cap.read()
+        if not res:
+            raise IOError("video failure")
 
         detections = get_person_detection(frame, net)
         person_detected_nb = sum(1 for element in (detections[0, 0, :, 1] == 15) if (element == True))
@@ -92,5 +94,6 @@ def main_person_detection(cap):
             frame = handle_person_detection(frame, detections)
 
         frame_list.append(frame)
+        frame_count += 1
 
     return frame_list
