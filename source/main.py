@@ -43,12 +43,6 @@ def main():
 
         custom.wrapper.posenet_module(args, sess, cap, symptoms)
 
-        # --- Estimate symptoms here
-        # Do an average for the mouth/eyes open, for the person being on the ground and
-        # for the hand being near the throat
-        # Analyze the red variation of the forehead to get the cardiac pace, and check if it's fast, slow,
-        # or if their is none
-
         cap.release()
         cv2.destroyAllWindows()
         custom.run_app()
