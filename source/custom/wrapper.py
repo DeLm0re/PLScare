@@ -3,10 +3,10 @@ import posenet
 import cv2
 
 
-def posenet_module(args, sess, cap, symptoms):
-
+def posenet_module(args, sess, video, symptoms):
+    # Frame info
     frame_count = 0
-    total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    total_frame = len(video)
 
     # posenet init
     model_cfg, model_outputs = posenet.load_model(args.model, sess)
@@ -14,8 +14,8 @@ def posenet_module(args, sess, cap, symptoms):
     # posenet treatment loop
     while frame_count < total_frame:
         # read an image from the capture device or video
-        input_image, display_image, output_scale = posenet.read_cap(
-            cap, scale_factor=args.scale_factor, output_stride=output_stride)
+        input_image, display_image, output_scale = \
+            posenet.utils.process_input(video[frame_count], scale_factor=args.scale_factor, output_stride=output_stride)
 
         # extract info from image
         heatmaps_result, offsets_result, displacement_fwd_result, displacement_bwd_result = sess.run(

@@ -37,11 +37,10 @@ def main():
         # diagnostic init
         symptoms = custom.detection.create_symptoms_dict()
 
-        # --- Do coco treatment here
-        # Get if the subject is laying on the floor and rotate the video if necessary to get better treatment results
-        # (most treatment works only on standing up person)
-
-        custom.wrapper.posenet_module(args, sess, cap, symptoms)
+        # Caffe analysis
+        frames = custom.person_detection.person_detection_module(cap)
+        # Posenet analysis
+        custom.wrapper.posenet_module(args, sess, frames, symptoms)
 
         cap.release()
         cv2.destroyAllWindows()
