@@ -1,10 +1,5 @@
 # import the necessary packages
-from imutils.video import VideoStream
-from imutils.video import FPS
 import numpy as np
-import argparse
-import imutils
-import time
 import cv2
 import math
 
@@ -65,23 +60,20 @@ def handle_person_detection(frame, detections):
     return cropped_frame
 
 
-def main_person_detection(py_args):
+def main_person_detection(cap):
     # load our serialized model from disk
-    print("[INFO] loading model...")
-    net = cv2.dnn.readNetFromCaffe(py_args["prototxt"], py_args["model"])
+    net = cv2.dnn.readNetFromCaffe("../assets/caffe_models/MobileNetSSD_deploy.prototxt.txt",
+                                   "../assets/caffe_models/MobileNetSSD_deploy.caffemodel")
 
-    # initialize the video stream, allow the camera sensor to warm-up,
-    # and initialize the FPS counter
-    print("[INFO] starting video stream...")
-    vs = VideoStream(src=0).start()
-    time.sleep(2.0)
-    fps = FPS().start()
+    frame_count = 0
+    total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    while True:
+    frame_list = []
+
+    while frame_count < total_frame:
         # grab the frame from the threaded video stream and resize it
         # to have a maximum width of 400 pixels
-        frame = vs.read()
-        frame = imutils.resize(frame, width=400)
+        frame = cap.read()
 
         detections = get_person_detection(frame, net)
         person_detected_nb = sum(1 for element in (detections[0, 0, :, 1] == 15) if (element == True))
@@ -92,42 +84,13 @@ def main_person_detection(py_args):
             person_detected_nb = sum(1 for element in (detections[0, 0, :, 1] == 15) if (element is True))
 
             if person_detected_nb == 0:
-                frame = np.rot90(frame,2)
+                frame = np.rot90(frame, 2)
                 detections = get_person_detection(frame, net)
                 person_detected_nb = sum(1 for element in (detections[0, 0, :, 1] == 15) if (element is True))
 
         if not person_detected_nb == 0:
             frame = handle_person_detection(frame, detections)
 
-        # show the output frame
-        cv2.imshow("Frame", frame)
-        key = cv2.waitKey(1) & 0xFF
+        frame_list.append(frame)
 
-        # if the `q` key was pressed, break from the loop
-        if key == ord("q"):
-            break
-
-        # update the FPS counter
-        fps.update()
-
-    # stop the timer and display FPS information
-    fps.stop()
-    print("[INFO] elapsed time: {:.2f}".format(fps.elapsed()))
-    print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
-
-    # do a bit of cleanup
-    cv2.destroyAllWindows()
-    vs.stop()
-
-    return 0
-
-
-# construct the argument parse and parse the arguments
-ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--prototxt", required=True,
-                help="path to Caffe 'deploy' prototxt file")
-ap.add_argument("-m", "--model", required=True,
-                help="path to Caffe pre-trained model")
-args = vars(ap.parse_args())
-
-main_person_detection(args)
+    return frame_list
