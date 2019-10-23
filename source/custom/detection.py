@@ -107,7 +107,7 @@ def get_face(pose_id, keypoint_scores, keypoint_coords, image):
     return crop_image(square, image)
 
 
-# Crop the forehead person from a posenet skeleton
+# Crop the forehead from a posenet skeleton
 def get_forehead(pose_id, keypoint_scores, keypoint_coords, image):
     parts_names = ['leftEye', 'rightEye']
     parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
@@ -152,6 +152,42 @@ def get_mouth(pose_id, keypoint_scores, keypoint_coords, image):
     x_min = parts_info['rightEar']['x'] + np.abs(parts_info['leftEar']['x'] - parts_info['rightEar']['x']) / 3
     x_max = parts_info['leftEar']['x'] - np.abs(parts_info['leftEar']['x'] - parts_info['rightEar']['x']) / 3
     square = create_square(x_min, x_max, y_min, y_max, scale=1)
+    return crop_image(square, image)
+
+
+# Crop the left eye from a posenet skeleton
+def get_left_eye(pose_id, keypoint_scores, keypoint_coords, image):
+    parts_names = ['leftEye', 'rightEye']
+
+    parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+
+    btw_eyes = parts_info['leftEye']['x']-parts_info['rightEye']['x']
+
+    x_min = parts_info['leftEye']['x']-(btw_eyes*0.1)
+    x_max = parts_info['leftEye']['x']+(btw_eyes*0.1)
+    y_min = parts_info['leftEye']['y']-(btw_eyes*0.05)
+    y_max = parts_info['leftEye']['y']+(btw_eyes*0.05)
+
+    square = create_square(x_min, x_max, y_min, y_max, scale=1.5)
+
+    return crop_image(square, image)
+
+
+# Crop the right eye from a posenet skeleton
+def get_right_eye(pose_id, keypoint_scores, keypoint_coords, image):
+    parts_names = ['leftEye', 'rightEye']
+
+    parts_info = get_info_skeleton(pose_id, keypoint_scores, keypoint_coords, parts_names)
+
+    btw_eyes = parts_info['leftEye']['x']-parts_info['rightEye']['x']
+
+    x_min = parts_info['rightEye']['x']-(btw_eyes*0.1)
+    x_max = parts_info['rightEye']['x']+(btw_eyes*0.1)
+    y_min = parts_info['rightEye']['y']-(btw_eyes*0.05)
+    y_max = parts_info['rightEye']['y']+(btw_eyes*0.05)
+
+    square = create_square(x_min, x_max, y_min, y_max, scale=1.5)
+
     return crop_image(square, image)
 
 
@@ -202,6 +238,31 @@ def is_mouth_open(pose_id, keypoint_scores, keypoint_coords, image):
     base_value = custom.image_treatment.get_average_value(image_face)
 
     if np.abs(base_value - average_value) > 15:
+        return True
+    else:
+        return False
+
+
+# Check if one or more eyes are open
+def are_eyes_open(pose_id, keypoint_scores, keypoint_coords, image):
+    image_left_eye = custom.detection.get_left_eye(pose_id, keypoint_scores, keypoint_coords, image)
+    image_right_eye = custom.detection.get_right_eye(pose_id, keypoint_scores, keypoint_coords, image)
+
+    med = int(image_left_eye.shape[0]/2)
+
+    hsvL = cv2.cvtColor(image_left_eye, cv2.COLOR_BGR2HSV)
+    hsvR = cv2.cvtColor(image_right_eye, cv2.COLOR_BGR2HSV)
+    hueL, satL, valL = cv2.split(hsvL)
+    hueR, satR, valR = cv2.split(hsvR)
+    whiteL = whiteR = 0
+
+    for i in range(hueL.shape[1]):
+        if hueL[med][i] > 40:
+            whiteL = whiteL+1
+        if hueR[med][i] > 40:
+            whiteR = whiteR+1
+
+    if whiteL > 1 or whiteR > 1:
         return True
     else:
         return False
