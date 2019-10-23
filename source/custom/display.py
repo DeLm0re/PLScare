@@ -10,6 +10,9 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 
 kivy.require('1.11.1')
 
+# Definition de la variable globale
+screen_manager = ScreenManager()
+
 # -------------------------------------------------------------------------------------------------------------
 # -------------------------------------    FUNCTION DEFINITION    ---------------------------------------------
 # -------------------------------------------------------------------------------------------------------------
@@ -20,8 +23,12 @@ def init_window(height, width):
     Window.size = (height, width)
 
 
-def switch_screen(self, screen_name, *args):
-    self.manager.current = screen_name
+def switch_screen(screen_name, situation_name, *args):
+    if screen_name == 'ThirdScreen':
+        screen_manager.add_widget(globals()[screen_name](situation_name=situation_name, name=screen_name))
+    else:
+        screen_manager.add_widget(globals()[screen_name](name=screen_name))
+    screen_manager.current = screen_name
 
 
 def setup_solution(screen, situation_name):
@@ -136,8 +143,8 @@ class FirstScreen(Screen):
         img_logo = LogoImg()
 
         # event on button
-        record_btn.bind(on_press=partial(switch_screen, self, '_second_screen_'))
-        video_btn.bind(on_press=partial(switch_screen, self, '_second_screen_'))
+        record_btn.bind(on_press=partial(switch_screen, 'SecondScreen'))
+        video_btn.bind(on_press=partial(switch_screen, 'SecondScreen'))
 
         # add element in screen
         self.add_widget(record_btn)
@@ -156,8 +163,8 @@ class SecondScreen(Screen):
         no_btn = CustomBtn(0.5, 0.2, 'Non', 40)
 
         # event on button
-        yes_btn.bind(on_press=partial(switch_screen, self, '_third_screen_'))
-        no_btn.bind(on_press=partial(switch_screen, self, '_third_screen_'))
+        yes_btn.bind(on_press=partial(switch_screen, 'ThirdScreen', 'Saignement'))
+        no_btn.bind(on_press=partial(switch_screen, 'ThirdScreen', 'Etouffement'))
 
         # add element in screen
         self.add_widget(ask_label)
@@ -167,21 +174,18 @@ class SecondScreen(Screen):
 
 class ThirdScreen(Screen):
 
-    def __init__(self, **kwargs):
+    def __init__(self, situation_name, **kwargs):
         super(Screen, self).__init__(**kwargs)
 
-        # example of a situation
-        setup_solution(self, 'Arret_cardiaque')
+        # display of a situation
+        setup_solution(self, situation_name)
 
 
 class PlscareApp(App):
 
     def build(self):
-        # init the screen manager
-        screen_manager = ScreenManager()
-        screen_manager.add_widget(FirstScreen(name='_first_screen_'))
-        screen_manager.add_widget(SecondScreen(name='_second_screen_'))
-        screen_manager.add_widget(ThirdScreen(name='_third_screen_'))
+        # init the screen manager with the first screen
+        screen_manager.add_widget(FirstScreen(name='FirstScreen'))
         return screen_manager
 
 
