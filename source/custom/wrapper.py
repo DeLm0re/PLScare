@@ -51,3 +51,9 @@ def posenet_module(args, sess, cap, symptoms):
         # check the 'q' key to end the loop
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+    # --- Estimate symptoms here
+    # Do an average for the mouth/eyes open, for the person being on the ground and
+    # for the hand being near the throat
+    # Analyze the red variation of the forehead to get the cardiac pace, and check if it's fast, slow,
+    # or if their is none
