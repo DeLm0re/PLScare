@@ -288,12 +288,12 @@ def get_diagnostics(symptoms):
     diagnostic = dict()
     diagnostic["Etouffement"] = \
         (symptoms["hand_near_throat"] + symptoms["mouth_open"] + (1 - symptoms["eyes_close"]) +
-         + (1 - symptoms["laying_on_ground"])) / 5
+         + (1 - symptoms["laying_on_ground"])) / 4
         #(symptoms["hand_near_throat"] + symptoms["mouth_open"] + (1 - symptoms["eyes_close"]) +
         # symptoms["fast_cardiac_pace"] + (1 - symptoms["laying_on_ground"])) / 5
 
     diagnostic["Inconscient"] = \
-        (symptoms["eyes_close"] + symptoms["laying_on_ground"]) / 5
+        (symptoms["eyes_close"] + symptoms["laying_on_ground"]) / 2
         #(symptoms["eyes_close"] + symptoms["laying_on_ground"] +
         # (1 - symptoms["fast_cardiac_pace"] + 1 - symptoms["no_cardiac_pace"])) / 5
 
