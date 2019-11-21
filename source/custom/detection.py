@@ -283,23 +283,29 @@ def create_symptoms_dict():
 # Get the diagnostic of a person based on his symptoms
 # Each symptoms should be a percentage
 def get_diagnostics(symptoms):
+	# No cardiac pace detection, so we don't do the cardiac diagnostic
+	# We also don't take into account the fast and no cardiac pace symptoms
     diagnostic = dict()
     diagnostic["Etouffement"] = \
         (symptoms["hand_near_throat"] + symptoms["mouth_open"] + (1 - symptoms["eyes_close"]) +
-         symptoms["fast_cardiac_pace"] + (1 - symptoms["laying_on_ground"])) / 5
+         + (1 - symptoms["laying_on_ground"])) / 4
+        #(symptoms["hand_near_throat"] + symptoms["mouth_open"] + (1 - symptoms["eyes_close"]) +
+        # symptoms["fast_cardiac_pace"] + (1 - symptoms["laying_on_ground"])) / 5
 
     diagnostic["Inconscient"] = \
-        (symptoms["eyes_close"] + symptoms["laying_on_ground"] +
-         (1 - symptoms["fast_cardiac_pace"] + 1 - symptoms["no_cardiac_pace"])) / 5
+        (symptoms["eyes_close"] + symptoms["laying_on_ground"]) / 2
+        #(symptoms["eyes_close"] + symptoms["laying_on_ground"] +
+        # (1 - symptoms["fast_cardiac_pace"] + 1 - symptoms["no_cardiac_pace"])) / 5
 
-    diagnostic["Arret_cardiaque"] = \
-        ((1 - symptoms["eyes_close"]) + symptoms["laying_on_ground"] + symptoms["no_cardiac_pace"]) / 5
+    #diagnostic["Arret_cardiaque"] = \
+    #    ((1 - symptoms["eyes_close"]) + symptoms["laying_on_ground"] + symptoms["no_cardiac_pace"]) / 5
 
     # To differentiate these two, ask the user if the person is hurt
-    diagnostic["Malaise_cardiaque"] = \
-        ((1 - symptoms["eyes_close"]) + 1 + 1) / 5  # (+ 1 whatever position) (+ 1 whatever cardiac pace)
+    #diagnostic["Malaise_cardiaque"] = \
+    #    ((1 - symptoms["eyes_close"]) + 1 + 1) / 5  # (+ 1 whatever position) (+ 1 whatever cardiac pace)
 
     diagnostic["Saignement"] = \
-        ((1 - symptoms["eyes_close"]) + symptoms["fast_cardiac_pace"] + 1) / 5  # (+ 1 whatever position)
+    	((1 - symptoms["eyes_close"]) + 1) / 5  # (+ 1 whatever position)
+        #((1 - symptoms["eyes_close"]) + symptoms["fast_cardiac_pace"] + 1) / 5  # (+ 1 whatever position)
 
     return diagnostic

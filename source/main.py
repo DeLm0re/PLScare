@@ -38,9 +38,15 @@ def main():
         symptoms = custom.detection.create_symptoms_dict()
 
         # Caffe analysis
-        frames = custom.person_detection.person_detection_module(cap)
+        video_output = []
+        symptoms["laying_on_ground"] = custom.person_detection.person_detection_module(cap, video_output)
         # Posenet analysis
-        custom.wrapper.posenet_module(args, sess, frames, symptoms)
+        custom.wrapper.posenet_module(args, sess, video_output, symptoms)
+        
+        # Diagnostic calculation
+        print(symptoms)
+        diagnostic = custom.detection.get_diagnostics(symptoms)
+        print(diagnostic)
 
         cap.release()
         cv2.destroyAllWindows()
