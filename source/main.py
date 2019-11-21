@@ -41,6 +41,11 @@ def main():
         frames = custom.person_detection.person_detection_module(cap)
         # Posenet analysis
         custom.wrapper.posenet_module(args, sess, frames, symptoms)
+        
+        # Diagnostic calculation
+        print(symptoms)
+        diagnostic = custom.detection.get_diagnostics(symptoms)
+        print(diagnostic)
 
         cap.release()
         cv2.destroyAllWindows()
